@@ -1,3 +1,4 @@
 # dudeozi
 
-mole game made with arduino and neopixels
+mole game made with arduino and neopixel
+but, there isn't mole...
