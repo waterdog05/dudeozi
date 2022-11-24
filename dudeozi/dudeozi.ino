@@ -5,17 +5,19 @@
 #define BRIGHTNESS 180
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
-LiquidCrystal_I2C lcd(16, 2, 0x27);
+LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 const int srtBtn = 13;  //start button
 int srtVal;  //start button value
 const int buzPin = 12;  //buzzer pin
-int btn[] = {0, 1, 2, 3, 4, 5, 6, 7, 8};  //button pin array
+int btn[] = {2, 3, 4, 5, 6, 7, 8, 9, 10};  //button pin array
 int ranVal = 0;  //random value
 int ending = 1;  //quit game
 int life = 0;  //life
 int score = 0;  //score = score * 10
 int bestScore = 0;  //best score
+int nxtDel = 600;
+int btnDel = 10;
 
 void dudeozi();
 
@@ -45,6 +47,7 @@ void loop() {
       ending = 0;
       score = 0;
       life = 3;
+      lcd.clear();
       lcd.setCursor(5, 0);
       lcd.print("Start!");
       Serial.println("Start!");
@@ -61,7 +64,7 @@ void loop() {
       bestScore = score;
       lcd.clear();
       lcd.setCursor(0, 0);
-      lcd.print("Now Best Score");
+      lcd.print("New Best Score");
       lcd.setCursor(1, 1);
       lcd.print("Best Score:");
       lcd.print(bestScore);
@@ -89,11 +92,11 @@ void loop() {
     ranVal = getTrueRotateRandomByte() % 9;  //random number 0~8
     dudeozi();
   }
-  delay(600);  //delay for next one
+  delay(nxtDel);  //delay for next one
 }
 
 void dudeozi() {
-  for (int cnt=0; cnt < 10; cnt++) {
+  for (int cnt=0; cnt < btnDel; cnt++) {
     if (life == 0) {
       break;
     } else if (digitalRead(btn[ranVal]) == 0) {
@@ -112,9 +115,22 @@ void dudeozi() {
       noTone(buzPin);
       score += 10;
       life++;
+      
+      if (nxtDel>200) {
+          nxtDel -= 10; 
+      } else {
+        nxtDel = 200;
+      }
+
+      if (btnDel>5) {
+          btnDel -= 1;
+      } else {
+          btnDel = 5;
+      }
+      
       break;
     } else {
-      strip.setPixelColor(ranVal, 0, 127, 0, 0);
+      strip.setPixelColor(ranVal, 0, 200, 0, 0);
       strip.show();
       Serial.println(ranVal);
       delay(50);
@@ -129,7 +145,7 @@ void dudeozi() {
   lcd.print(life);
   Serial.print("score:");
   Serial.println(score);
-  lcd.setCursor(3, 0);
+  lcd.setCursor(3, 1);
   lcd.print("score:");
   lcd.print(score);
 }
